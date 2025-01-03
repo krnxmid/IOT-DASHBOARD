@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Dashboard - Realtime Graph with Auto-Scroll</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #plotContainer {
+            flex: 1;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="plotContainer"></div>
+    </div>
+
+    <script>
+        const traces = Array.from({ length: 12 }, (_, i) => ({
+            x: [],
+            y: [],
+            mode: 'lines',
+            name: `TAG ${i + 1}`,
+            line: { shape: 'linear' } // Line shape for smooth curve
+        }));
+
+        const layout = {
+            title: 'Realtime Data Graph',
+            xaxis: { title: 'Time' },
+            yaxis: { title: 'Value' },
+            margin: { l: 50, r: 50, b: 50, t: 50 },
+            height: 400, // Decreased height by 40px (adjust as needed)
+            width: window.innerWidth / 2 - 40 // Adjust width for graph container
+        };
+
+
+        // Initialize Plotly graph
+        Plotly.newPlot('plotContainer', traces, layout);
+
+        let autoScroll = false;
+
+        // Toggle auto-scroll on double-click
+        document.getElementById('plotContainer').addEventListener('dblclick', () => {
+            autoScroll = !autoScroll;
+            if (autoScroll) {
+                console.log("Auto-scroll enabled");
+            } else {
+                console.log("Auto-scroll disabled");
+            }
+        });
+
+        // Simulate new data every second
+        function updateGraph() {
+            const now = new Date().toLocaleTimeString();
+            traces.forEach((trace, i) => {
+                const newVal = Math.floor(Math.random() * 100); // Simulated data
+                trace.x.push(now);
+                trace.y.push(newVal);
+
+                // Limit the number of data points to 50 for better performance
+                if (trace.x.length > 50) {
+                    trace.x.shift();
+                    trace.y.shift();
+                }
+            });
+
+            Plotly.redraw('plotContainer');
+
+            // Auto-scroll behavior
+            if (autoScroll) {
+                const lastTraceIndex = traces[0].x.length - 1;
+                const update = {
+                    xaxis: {
+                        range: [traces[0].x[lastTraceIndex - 50] || 0, traces[0].x[lastTraceIndex] || 1]
+                    }
+                };
+                Plotly.relayout('plotContainer', update);
+            }
+        }
+
+        setInterval(updateGraph, 1000);
+    </script>
+</body>
+</html>

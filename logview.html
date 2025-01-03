@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Dashboard - Log View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #181818; /* Dark background */
+            color: #f1f1f1; /* Light text color */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #333; /* Dark background for table */
+            color: #f1f1f1;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #444;
+            text-align: left;
+        }
+        th {
+            background-color: #555;
+        }
+        #logTableContainer {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .small-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            position: absolute;
+            top: 10px;
+            left: 1100px;
+            cursor: pointer;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .small-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <button class="small-button" onclick="navigateToRealtime()">Go to Realtime View</button>
+    <h1>IoT Dashboard - Log View</h1>
+    <div id="logTableContainer">
+        <table id="logTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>TAG 1</th>
+                    <th>TAG 2</th>
+                    <th>TAG 3</th>
+                    <th>TAG 4</th>
+                    <th>TAG 5</th>
+                    <th>TAG 6</th>
+                    <th>TAG 7</th>
+                    <th>TAG 8</th>
+                    <th>TAG 9</th>
+                    <th>TAG 10</th>
+                    <th>TAG 11</th>
+                    <th>TAG 12</th>
+                </tr>
+            </thead>
+            <tbody id="logBody">
+                <!-- Data rows will be added here via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Function to add a new row of random log data
+        // Function to add a new row of random log data
+            // Function to add a new row of random log data
+function addRandomLogData() {
+    const tbody = document.getElementById('logBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${new Date().toLocaleTimeString()}</td>` +
+        Array.from({ length: 12 }, () => `<td>${Math.floor(Math.random() * 100)}</td>`).join('');
+
+    // Prepend the new row to the top
+    tbody.insertBefore(row, tbody.firstChild);
+}
+
+
+
+        // Periodically add new data
+        setInterval(addRandomLogData, 1000);
+
+        function navigateToRealtime() {
+            window.location.href = 'realtime.html';
+        }
+    </script>
+</body>
+</html>

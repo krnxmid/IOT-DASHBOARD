@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Dashboard - Realtime View</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #181818; /* Dark background */
+            color: #f1f1f1; /* Light text color */
+        }
+        .main-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+        .left-container, .right-container {
+            flex: 1;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        .left-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 50px; /* Move the grid down */
+            max-height: 60%;
+        }
+        .box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #333; /* Dark background for the boxes */
+            border: 1px solid #444;
+            aspect-ratio: 1;
+            font-size: 18px;
+            font-weight: bold;
+            color: #f1f1f1;
+            border-radius: 10px; /* Rounded corners for the boxes */
+        }
+        .right-container {
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .box {
+            display: flex;
+            flex-direction: column; /* Stack the elements vertically */
+            justify-content: center;
+            align-items: center;
+            background-color: #25252599;
+            border: 1px solid #ccc;
+            aspect-ratio: 1; /* Makes each box a square */
+            padding: 10px;
+        }
+        
+        .tag-name {
+            font-weight: bold;
+            margin-bottom: 5px; /* Adds some space between the name and value */
+        }
+        
+        .tag-value {
+            font-size: 16px; /* Adjust the value font size if needed */
+        }
+        
+        .small-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            position: absolute;
+            top: 10px;
+            left: 1100px;
+            cursor: pointer;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .small-button:hover {
+            background-color: #0056b3;
+        }
+
+        #plotContainer {
+            border-radius: 15px;
+            padding: 50px;
+            height: 400px; /* Rounded corners for the graph */
+        }
+    </style>
+</head>
+<body>
+    <button class="small-button" onclick="navigateToLog()">Go to Log View</button>
+
+    <div class="main-container">
+        <!-- Left half for boxes -->
+        <div class="left-container" id="tagBoxesContainer">
+            <!-- Tag boxes will be added here using JavaScript -->
+        </div>
+
+        <!-- Right half for graph -->
+        <div class="right-container" id="plotContainer">
+            <!-- Plotly Graph Container -->
+        </div>
+    </div>
+
+    <script>
+        // Dynamically generate 12 boxes for TAG values and update with values
+        const container = document.getElementById('tagBoxesContainer');
+        container.innerHTML = Array.from({ length: 12 }, (_, i) => 
+            `<div class="box">
+                <div class="tag-name">TAG-${i + 1}</div>
+                <div class="tag-value" id="tag${i + 1}">0</div>
+            </div>`
+        ).join('');
+        
+        
+        
+        
+
+        // Simulate updating values (replace this with real data in practice)
+        setInterval(() => {
+            for (let i = 1; i <= 12; i++) {
+                const tagValue = Math.floor(Math.random() * 100);
+                document.getElementById(`tag${i}`).textContent = tagValue;
+            }
+        }, 1000);
+
+        // List of colors for each tag's line in the graph
+        const colors = [
+            '#FF5733', '#33FF57', '#3357FF', '#F033FF', '#FF5733', '#FF8F33', 
+            '#8FFF33', '#33FF8F', '#33A1FF', '#FF33A1', '#A1FF33', '#FF3333'
+        ];
+
+        // Plotly graph setup with dark theme
+        const traces = Array.from({ length: 12 }, (_, i) => ({
+            x: [],
+            y: [],
+            mode: 'lines',
+            name: `TAG ${i + 1}`,
+            line: { color: colors[i] }  // Use a unique color for each line
+        }));
+
+        const layout = {
+            title: {
+                text: 'Realtime Data Graph',
+                font: { color: '#f1f1f1' } // White title text
+            },
+            xaxis: {
+                title: 'Time',
+                showgrid: false,
+                zeroline: false,
+                rangemode: 'normal',
+                tickfont: { color: '#f1f1f1' }, // Light text for x-axis
+                gridcolor: '#444', // Light gridlines
+                fixedrange: false // Allow zooming and panning
+            },
+            yaxis: {
+                title: 'Value',
+                autorange: true,
+                showgrid: true,
+                tickfont: { color: '#f1f1f1' }, // Light text for y-axis
+                gridcolor: '#444', // Light gridlines
+                fixedrange: false // Allow zooming and panning
+            },
+            plot_bgcolor: '#181818', // Dark background for plot
+            paper_bgcolor: '#181818', // Dark background for entire graph
+            margin: { l: 50, r: 50, b: 50, t: 50 },
+            height: 500,
+            width: window.innerWidth / 2 - 40
+        };
+
+        Plotly.newPlot('plotContainer', traces, layout);
+
+        function updateGraph() {
+            const now = new Date().toLocaleTimeString();
+            traces.forEach((trace, i) => {
+                const newVal = Math.floor(Math.random() * 100);
+                trace.x.push(now);
+                trace.y.push(newVal);
+
+                // Limit the number of data points to 50
+                if (trace.x.length > 50) {
+                    trace.x.shift();
+                    trace.y.shift();
+                }
+            });
+
+            // Redraw the graph
+            Plotly.redraw('plotContainer');
+        }
+
+        setInterval(updateGraph, 1000);
+
+        function navigateToLog() {
+            window.location.href = 'logview.html';
+        }
+    </script>
+</body>
+</html>
